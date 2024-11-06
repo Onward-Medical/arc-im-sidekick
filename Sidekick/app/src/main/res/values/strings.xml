@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARC-IM® Sidekick</string>
+
+    <string name="hello_world">From the Round world,\nHello, %1$s!</string>
+</resources>
