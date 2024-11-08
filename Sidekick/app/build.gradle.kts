@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
-    namespace = "com.example.android.wearable.composestarter"
+    namespace = "com.onwd.arc.im.sidekick"
 
     defaultConfig {
-        applicationId = "com.example.android.wearable.composestarter"
-        minSdk = 26
-        targetSdk = 34
+        applicationId = "com.onwd.arc.im.sidekick"
+        minSdk = 33
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -89,6 +89,23 @@ dependencies {
     implementation(libs.wear.compose.navigation)
 
     implementation(libs.androidx.ui.test.manifest)
+
+    // Health Services
+    implementation(libs.androidx.health.services)
+
+    // Used to bridge between Futures and coroutines
+    implementation(libs.guava)
+    implementation(libs.concurrent.futures)
+
+    // Used for WorkManager
+    implementation(libs.androidx.work)
+    implementation(libs.androidx.work.ktx)
+
+    // Used for Datastore
+    implementation(libs.androidx.datastore)
+
+    // Used for permissions
+    implementation(libs.accompanist.permissions)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 

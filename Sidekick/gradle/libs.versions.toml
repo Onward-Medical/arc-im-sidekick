@@ -1,10 +1,17 @@
 [versions]
+accompanist-permissions = "0.36.0"
 android-gradle-plugin = "8.7.2"
 androidx-activity = "1.9.3"
+androidx-datastore = "1.1.1"
 androidx-compose-bom = "2024.10.01"
 androidx-wear-compose = "1.4.0"
 compose-compiler = "1.5.15"
 compose-ui-tooling = "1.4.0"
+androidx-work = "2.10.0"
+compose = "1.7.3"
+concurrent-futures = "1.2.0"
+guava = "33.3.1-android"
+health-services = "1.0.0-rc02"
 horologist = "0.6.20"
 ktlint = "0.50.0"
 org-jetbrains-kotlin = "1.9.25"
@@ -14,18 +21,25 @@ ui-test-junit4 = "1.7.5"
 ui-test-manifest = "1.7.5"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
+androidx-health-services = { module = "androidx.health:health-services-client", version.ref = "health-services" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-ui-tooling = { module = "androidx.wear.compose:compose-ui-tooling", version.ref = "compose-ui-tooling" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-splashscreen =  "androidx.core:core-splashscreen:1.0.1"
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "ui-test-junit4" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui-test-manifest" }
+androidx-work = { module = "androidx.work:work-runtime", version.ref = "androidx-work" }
+androidx-work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-desugar-jdk-libs = "com.android.tools:desugar_jdk_libs:2.1.2"
+concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent-futures" }
+desugar-jdk-libs = "com.android.tools:desugar_jdk_libs:2.1.3"
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 horologist-compose-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist" }
 horologist-compose-material = { module = "com.google.android.horologist:horologist-compose-material", version.ref = "horologist" }
 horologist-roboscreenshots = { module = "com.google.android.horologist:horologist-roboscreenshots", version.ref = "horologist" }
