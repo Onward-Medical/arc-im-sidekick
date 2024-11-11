@@ -5,6 +5,7 @@ import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,11 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
+import com.onwd.arc.im.sidekick.R
 import com.onwd.arc.im.sidekick.presentation.SensorToggle
 import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import org.checkerframework.checker.units.qual.C
 
 fun tickerFlow(periodMillis: Long): Flow<Long> = flow {
     while (true) {
@@ -39,6 +44,7 @@ fun tickerFlow(periodMillis: Long): Flow<Long> = flow {
 fun MenuScreen(
     enabled: Boolean,
     latestReading: OffsetDateTime?,
+    latestUpload: OffsetDateTime?,
     onEnableClick: (Boolean) -> Unit,
     permissionState: MultiplePermissionsState
 ) {
@@ -53,12 +59,16 @@ fun MenuScreen(
         }
     }
 
-    fun relativeTimeSpanString() =
-        DateUtils.getRelativeTimeSpanString(
-            latestReading?.toInstant()?.toEpochMilli() ?: 0,
-            currentTime,
-            DateUtils.SECOND_IN_MILLIS
-        )
+    @Composable
+    fun relativeTimeSpanString(dateTime: OffsetDateTime?): String =
+        dateTime?.toInstant()?.toEpochMilli()?.let {
+            DateUtils.getRelativeTimeSpanString(
+                it,
+                currentTime,
+                DateUtils.SECOND_IN_MILLIS
+            ).toString()
+        } ?: stringResource(R.string.never)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,7 +79,15 @@ fun MenuScreen(
             onCheckedChange = { enabled -> onEnableClick(enabled) },
             permissionState = permissionState
         )
-        Text("Latest reading:\n${relativeTimeSpanString()}")
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text("Latest reading:")
+            Text(relativeTimeSpanString(latestReading))
+            Text("Latest upload:")
+            Text(relativeTimeSpanString(latestUpload))
+        }
     }
 }
 
@@ -89,6 +107,10 @@ fun PreviewMenuScreen() {
             get() = throw NotImplementedError()
     }
     MenuScreen(
-        true, OffsetDateTime.now(), {}, permissionState = permissionState
+        true,
+        OffsetDateTime.now(),
+        null,
+        {},
+        permissionState = permissionState
     )
 }

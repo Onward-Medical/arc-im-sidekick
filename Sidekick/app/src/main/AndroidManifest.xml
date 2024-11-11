@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- Needed in order to re-register for data on device startup. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Needed for high sampling of accelerometer. -->
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 
     <uses-feature android:name="android.hardware.type.watch" />
 

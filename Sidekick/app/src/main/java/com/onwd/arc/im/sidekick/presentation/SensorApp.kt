@@ -36,6 +36,7 @@ fun SensorApp(
                 )
             )
             val latestReading by viewModel.latestReading.collectAsState()
+            val latestUpload by viewModel.latestUpload.collectAsState()
             val readingEnabled by viewModel.readingEnabled.collectAsState()
             val uiState by viewModel.uiState
 
@@ -53,6 +54,7 @@ fun SensorApp(
                         MenuScreen(
                             readingEnabled,
                             latestReading,
+                            latestUpload,
                             onEnableClick = { viewModel.toggleEnabled() },
                             permissionState
                         )

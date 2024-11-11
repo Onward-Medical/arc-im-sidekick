@@ -4,4 +4,5 @@
     <string name="sensor_toggle">Sensor</string>
     <string name="not_available">Not available on this device</string>
     <string name="warning">Warning</string>
+    <string name="never">Never</string>
 </resources>

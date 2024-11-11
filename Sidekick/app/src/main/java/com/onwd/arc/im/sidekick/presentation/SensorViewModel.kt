@@ -22,6 +22,9 @@ class SensorViewModel(
     val latestReading = passiveDataRepository.latestReading
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    val latestUpload = passiveDataRepository.latestUpload
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
     val readingEnabled = passiveDataRepository.passiveDataEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 

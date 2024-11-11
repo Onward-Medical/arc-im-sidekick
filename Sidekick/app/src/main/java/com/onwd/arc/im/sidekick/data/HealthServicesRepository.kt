@@ -8,7 +8,6 @@ import androidx.health.services.client.HealthServicesClient
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.HealthEvent
 import androidx.health.services.client.data.PassiveListenerConfig
-import com.onwd.arc.im.sidekick.TAG
 import com.onwd.arc.im.sidekick.service.DataService
 
 /**
@@ -32,7 +31,7 @@ class HealthServicesRepository(context: Context) {
 
     private val passiveListenerConfig = PassiveListenerConfig(
         dataTypes = dataTypes,
-        shouldUserActivityInfoBeRequested = false,
+        shouldUserActivityInfoBeRequested = true,
         dailyGoals = setOf(),
         healthEventTypes = setOf(HealthEvent.Type.FALL_DETECTED)
     )
@@ -43,7 +42,7 @@ class HealthServicesRepository(context: Context) {
     }
 
     suspend fun registerForPassiveData() {
-        Log.i(TAG, "Registering listener")
+        Log.i(this::class.simpleName, "Registering listener")
         passiveMonitoringClient.setPassiveListenerServiceAsync(
             DataService::class.java,
             passiveListenerConfig
@@ -51,7 +50,7 @@ class HealthServicesRepository(context: Context) {
     }
 
     suspend fun unregisterForPassiveData() {
-        Log.i(TAG, "Unregistering listeners")
+        Log.i(this::class.simpleName, "Unregistering listeners")
         passiveMonitoringClient.clearPassiveListenerServiceAsync().await()
     }
 }

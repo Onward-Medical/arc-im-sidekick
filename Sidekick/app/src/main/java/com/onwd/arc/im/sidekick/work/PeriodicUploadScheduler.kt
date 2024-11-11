@@ -1,0 +1,53 @@
+package com.onwd.arc.im.sidekick.work
+
+import android.content.Context
+import androidx.work.*
+import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_FLEX_MILLIS
+import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
+import java.util.concurrent.TimeUnit
+
+/**
+ * Internal class responsible for scheduling the [UploadWorker] to run periodically.
+ */
+internal class PeriodicUploadScheduler {
+    companion object {
+
+        /**
+         * Schedules the [UploadWorker] to run periodically. This method can be called multiple times in a row. Internal
+         * worker api will ensure that only one worker is running at a time, and respects the required constraints.
+         * @param context the context to use.
+         */
+        fun scheduleUploadWorker(
+            context: Context
+        ) {
+            val data = workDataOf()
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresCharging(true)
+                .build()
+
+            val periodicWorkRequest = PeriodicWorkRequestBuilder<UploadWorker>(
+                MIN_PERIODIC_INTERVAL_MILLIS,
+                TimeUnit.MILLISECONDS,
+                MIN_PERIODIC_FLEX_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+                .setConstraints(constraints)
+                .setInputData(data)
+                .build()
+
+            WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(
+                    WORKER_TAG,
+                    ExistingPeriodicWorkPolicy.UPDATE,
+                    periodicWorkRequest
+                )
+        }
+
+        /**
+         * Tag used to identify the [UploadWorker].
+         */
+        private const val WORKER_TAG = "ONWD_Sidekick_UploadWorker"
+    }
+}

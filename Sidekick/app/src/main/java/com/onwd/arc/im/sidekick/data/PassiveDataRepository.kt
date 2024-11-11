@@ -26,18 +26,33 @@ class PassiveDataRepository(private val context: Context) {
         }
     }
 
-    val latestReading: Flow<OffsetDateTime> = context.dataStore.data.map { prefs ->
-        prefs[LATEST_READING]
-    }.filterNotNull().map { OffsetDateTime.parse(it, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+    val latestReading: Flow<OffsetDateTime> = getLatestDateTime(LATEST_READING)
+
+    val latestUpload: Flow<OffsetDateTime> = getLatestDateTime(LATEST_UPLOAD)
 
     suspend fun storeLatestReading(latestReading: OffsetDateTime) {
+        storeDateTime(LATEST_READING, latestReading)
+    }
+
+    suspend fun storeLatestUpload(latestUpload: OffsetDateTime) {
+        storeDateTime(LATEST_UPLOAD, latestUpload)
+    }
+
+    private suspend fun storeDateTime(key: Preferences.Key<String>, dateTime: OffsetDateTime) {
         context.dataStore.edit { prefs ->
-            prefs[LATEST_READING] = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(latestReading)
+            prefs[key] = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime)
         }
+    }
+
+    private fun getLatestDateTime(key: Preferences.Key<String>): Flow<OffsetDateTime> {
+        return context.dataStore.data.map { prefs ->
+            prefs[key]
+        }.filterNotNull().map { OffsetDateTime.parse(it, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
     }
 
     companion object {
         private val PASSIVE_DATA_ENABLED = booleanPreferencesKey("passive_data_enabled")
         private val LATEST_READING = stringPreferencesKey("latest_reading")
+        private val LATEST_UPLOAD = stringPreferencesKey("latest_upload")
     }
 }
