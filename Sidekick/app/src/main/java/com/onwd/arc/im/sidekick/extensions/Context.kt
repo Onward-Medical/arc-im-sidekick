@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import com.onwd.arc.im.sidekick.PERMISSIONS
 
 internal fun Context.openSettings() {
-
     val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
     with(intent) {
         data = Uri.fromParts("package", packageName, null)

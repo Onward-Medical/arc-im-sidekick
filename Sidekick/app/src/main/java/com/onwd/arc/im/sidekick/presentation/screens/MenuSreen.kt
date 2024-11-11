@@ -29,7 +29,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import org.checkerframework.checker.units.qual.C
 
 fun tickerFlow(periodMillis: Long): Flow<Long> = flow {
     while (true) {
@@ -48,7 +47,6 @@ fun MenuScreen(
     onEnableClick: (Boolean) -> Unit,
     permissionState: MultiplePermissionsState
 ) {
-
     var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
 
     LaunchedEffect(Unit) {
@@ -72,7 +70,7 @@ fun MenuScreen(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         SensorToggle(
             checked = enabled,
@@ -81,7 +79,7 @@ fun MenuScreen(
         )
         Column(
             modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Center
         ) {
             Text("Latest reading:")
             Text(relativeTimeSpanString(latestReading))

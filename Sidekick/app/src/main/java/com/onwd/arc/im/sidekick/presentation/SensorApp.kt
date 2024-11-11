@@ -17,7 +17,6 @@ import com.onwd.arc.im.sidekick.presentation.screens.MenuScreen
 import com.onwd.arc.im.sidekick.presentation.screens.NotSupportedScreen
 import com.onwd.arc.im.sidekick.presentation.theme.WearAppTheme
 
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorApp(
@@ -28,7 +27,6 @@ fun SensorApp(
 
     WearAppTheme {
         AppScaffold {
-
             val viewModel: SensorViewModel = viewModel(
                 factory = SensorViewModelFactory(
                     healthServicesRepository = healthServicesRepository,
