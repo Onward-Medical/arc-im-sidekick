@@ -19,6 +19,6 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        PeriodicUploadScheduler.scheduleUploadWorker(this)
+        PeriodicUploadScheduler.scheduleUploadWorker(this, true)
     }
 }

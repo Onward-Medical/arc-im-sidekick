@@ -95,6 +95,9 @@ dependencies {
     // Health Services
     implementation(libs.androidx.health.services)
 
+    // OkHttp
+    implementation(libs.okhttp)
+
     // Used to bridge between Futures and coroutines
     implementation(libs.guava)
     implementation(libs.concurrent.futures)

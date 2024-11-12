@@ -3,69 +3,72 @@ package com.onwd.arc.im.sidekick.work
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import com.onwd.arc.im.sidekick.MainApplication
-import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.internal.UTC
 
 internal class UploadWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
-    private val repository by lazy {
-        (applicationContext as MainApplication).passiveDataRepository
-    }
-
-    private val uploadUrl
-        get() = URL(
-            "https://onwarddevfileupload.blob.core.windows.net/sensor-data/${
-                URLEncoder.encode(
-                    DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now()),
-                    Charsets.UTF_8
-                )
-            }?sv=2021-10-04&st=2024-11-12T10%3A30%3A42Z&se=2030-11-12T10%3A30%3A00Z&sr=c&sp=a" +
-                "&sig=GXN0lNTjhEn0F2F3%2F1hp0LHdgcM8aDvGRWQuuqttxhs%3D"
-        )
-
     override suspend fun doWork(): Result {
-        Log.i(this::class.simpleName, "Uploading data")
-        val fileExport = with(applicationContext as MainApplication) {
-            jsonFileStore.export()
-        }
-        if (fileExport.length() == 0L) {
-            Log.i(this::class.simpleName, "No data to upload")
-            return Result.success()
-        }
-        withContext(Dispatchers.IO) {
-            uploadUrl.openConnection() as HttpURLConnection
-        }
-            .apply {
-                doOutput = true
-                setRequestProperty("Content-Type", "application/json")
-                setRequestProperty("x-ms-blob-type", "BlockBlob")
-
-                outputStream.use { writer ->
-                    writer.write(fileExport.readBytes())
-                    writer.flush()
-                }
-
-                Log.i(
-                    this::class.simpleName,
-                    "Upload response: $responseCode"
-                )
-
-                if (responseCode != 201) {
-                    Log.e(this::class.simpleName, "Upload failed") // TODO store file for retry
-                    return Result.failure()
-                }
-            }
-
-        repository.storeLatestUpload(OffsetDateTime.now())
-        return Result.success()
+        return applicationContext.uploadData()
     }
 }
+
+private val client = OkHttpClient()
+
+suspend fun Context.uploadData(): Result {
+    Log.i(UploadWorker::class.simpleName, "Uploading data")
+    val repository = (applicationContext as MainApplication).passiveDataRepository
+    val fileExport = with(applicationContext as MainApplication) {
+        jsonFileStore.export()
+    }
+
+    if (fileExport.length() == 0L) {
+        Log.i(UploadWorker::class.simpleName, "No data to upload")
+        return Result.success()
+    }
+
+    withContext(Dispatchers.IO) {
+        client.newCall(
+            okhttp3.Request.Builder()
+                .url(uploadUrl(repository.getUserId()))
+                .put(
+                    fileExport.asRequestBody("application/jsonl".toMediaType())
+                )
+                .header("x-ms-blob-type", "BlockBlob")
+                .build()
+        ).execute().use { response ->
+            if (!response.isSuccessful) {
+                Log.e(
+                    UploadWorker::class.simpleName,
+                    "Upload request failed: ${response.code}"
+                )
+            }
+        }
+    }
+
+    repository.storeLatestUpload(OffsetDateTime.now())
+    return Result.success()
+}
+
+private fun uploadUrl(userId: String) = URL(
+    "https://onwarddevfileupload.blob.core.windows.net/sensor-data/$userId/${
+        URLEncoder.encode(
+            DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now(UTC.toZoneId())),
+            Charsets.UTF_8
+        )
+    }.jsonl?sv=2021-10-04&st=2024-11-12T14%3A28%3A36Z&se=2034-11-12T14%3A00%3A00Z&sr=c&sp=c" +
+        "&sig=N%2BlJH4isLlsXK3PO9V46Up2LVQ1wXBGrheVH8sUd2GY%3D"
+)

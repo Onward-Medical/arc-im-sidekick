@@ -12,6 +12,8 @@ import androidx.health.services.client.data.UserActivityInfo
 import com.onwd.arc.im.sidekick.MainApplication
 import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
@@ -26,6 +28,8 @@ private fun toPrimitive(value: Any?): JsonElement = when (value) {
     is Double -> JsonPrimitive(value)
     is String -> JsonPrimitive(value)
     is Boolean -> JsonPrimitive(value)
+    is Instant -> toPrimitive(OffsetDateTime.ofInstant(value, ZoneId.systemDefault()))
+    is OffsetDateTime -> JsonPrimitive(value.format(ISO_OFFSET_DATE_TIME))
     is HeartRateAccuracy -> JsonPrimitive(value.sensorStatus.name)
     is LocationAccuracy -> JsonObject(
         mapOf(
@@ -33,6 +37,7 @@ private fun toPrimitive(value: Any?): JsonElement = when (value) {
             "verticalPositionErrorMeters" to JsonPrimitive(value.verticalPositionErrorMeters)
         )
     )
+
     null -> JsonNull
     else -> throw IllegalArgumentException("Unsupported value type: $value")
 }
@@ -58,12 +63,12 @@ class DataService : PassiveListenerService() {
                         mapOf(
                             "type" to JsonPrimitive(it.dataType.name),
                             "value" to toPrimitive(it.value),
-                            "timestampMs" to JsonPrimitive(
+                            "datetime" to toPrimitive(
                                 it.getTimeInstant(
                                     Instant.ofEpochMilli(
                                         System.currentTimeMillis() - SystemClock.elapsedRealtime()
                                     )
-                                ).toEpochMilli()
+                                )
                             ),
                             "accuracy" to toPrimitive(it.accuracy)
                         )
@@ -74,19 +79,19 @@ class DataService : PassiveListenerService() {
                         mapOf(
                             "type" to JsonPrimitive(it.dataType.name),
                             "value" to toPrimitive(it.value),
-                            "startTime" to JsonPrimitive(
+                            "startTime" to toPrimitive(
                                 it.getStartInstant(
                                     Instant.ofEpochMilli(
                                         System.currentTimeMillis() - SystemClock.elapsedRealtime()
                                     )
-                                ).toEpochMilli()
+                                )
                             ),
-                            "endTime" to JsonPrimitive(
+                            "endTime" to toPrimitive(
                                 it.getStartInstant(
                                     Instant.ofEpochMilli(
                                         System.currentTimeMillis() - SystemClock.elapsedRealtime()
                                     )
-                                ).toEpochMilli()
+                                )
                             ),
                             "accuracy" to toPrimitive(it.accuracy)
                         )
@@ -105,7 +110,7 @@ class DataService : PassiveListenerService() {
                 JsonObject(
                     mapOf(
                         "type" to JsonPrimitive(info::class.simpleName),
-                        "timestampMs" to JsonPrimitive(info.stateChangeTime.toEpochMilli()),
+                        "datetime" to toPrimitive(info.stateChangeTime),
                         "value" to JsonPrimitive(info.userActivityState.name)
                     )
                 )
@@ -120,7 +125,7 @@ class DataService : PassiveListenerService() {
                     JsonObject(
                         mapOf(
                             "type" to JsonPrimitive(event::class.simpleName),
-                            "timestampMs" to JsonPrimitive(event.eventTime.toEpochMilli()),
+                            "datetime" to toPrimitive(event.eventTime),
                             "value" to JsonPrimitive(event.type.name)
                         )
                     )
@@ -143,7 +148,7 @@ class DataService : PassiveListenerService() {
                 JsonObject(
                     mapOf(
                         "type" to JsonPrimitive("BatteryState"),
-                        "timestampMs" to JsonPrimitive(System.currentTimeMillis()),
+                        "datetime" to toPrimitive(OffsetDateTime.now()),
                         "value" to JsonPrimitive(batteryLevel),
                         "status" to JsonPrimitive(batteryStatus)
                     )

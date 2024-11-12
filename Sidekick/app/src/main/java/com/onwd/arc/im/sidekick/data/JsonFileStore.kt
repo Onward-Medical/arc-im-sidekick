@@ -3,6 +3,8 @@ package com.onwd.arc.im.sidekick.data
 import android.content.Context
 import android.util.Log
 import java.io.File
+import java.io.FileOutputStream
+import java.io.PrintWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,14 +17,14 @@ import kotlinx.serialization.json.JsonElement
 class JsonFileStore(context: Context, private val prefix: String) {
     private val dataFlow: MutableSharedFlow<JsonElement> = MutableSharedFlow(0, 100)
     private val fileHandle = File(context.getExternalFilesDir(null), "$prefix.jsonl")
-    private val outputWriter = fileHandle.bufferedWriter()
+    private val outputWriter = PrintWriter(FileOutputStream(fileHandle, true), true)
 
     init {
         MainScope().launch {
             withContext(Dispatchers.IO) {
                 dataFlow.collect {
                     synchronized(fileHandle) {
-                        outputWriter.appendLine(Json.encodeToString(it))
+                        outputWriter.println(Json.encodeToString(it))
                     }
                 }
             }
@@ -38,13 +40,12 @@ class JsonFileStore(context: Context, private val prefix: String) {
 
     suspend fun export(): File {
         return withContext(Dispatchers.IO) {
+            val tempFile = File.createTempFile(prefix, ".jsonl")
             synchronized(fileHandle) {
-                val tempFile = File.createTempFile(prefix, ".jsonl")
-                outputWriter.flush()
                 fileHandle.copyTo(tempFile, overwrite = true)
-                fileHandle.delete()
-                tempFile
+                fileHandle.writeBytes(byteArrayOf())
             }
+            tempFile
         }
     }
 }

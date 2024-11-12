@@ -1,6 +1,7 @@
 package com.onwd.arc.im.sidekick.work
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -10,6 +11,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 /**
  * Internal class responsible for scheduling the [UploadWorker] to run periodically.
@@ -23,13 +26,13 @@ internal class PeriodicUploadScheduler {
          * @param context the context to use.
          */
         fun scheduleUploadWorker(
-            context: Context
+            context: Context,
+            runImmediately: Boolean = false
         ) {
             val data = workDataOf()
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresCharging(true)
                 .build()
 
             val periodicWorkRequest = PeriodicWorkRequestBuilder<UploadWorker>(
@@ -48,6 +51,16 @@ internal class PeriodicUploadScheduler {
                     ExistingPeriodicWorkPolicy.UPDATE,
                     periodicWorkRequest
                 )
+
+            if (runImmediately) {
+                MainScope().launch {
+                    try {
+                        context.uploadData()
+                    } catch (e: Exception) {
+                        Log.e(WORKER_TAG, "Failed to upload data", e)
+                    }
+                }
+            }
         }
 
         /**

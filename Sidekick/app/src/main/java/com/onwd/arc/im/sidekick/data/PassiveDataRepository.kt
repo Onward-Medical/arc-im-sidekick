@@ -11,6 +11,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "passive_data")
@@ -38,6 +39,18 @@ class PassiveDataRepository(private val context: Context) {
         storeDateTime(LATEST_UPLOAD, latestUpload)
     }
 
+    suspend fun getUserId(): String {
+        return context.dataStore.data.map { prefs ->
+            prefs[USER_ID]
+        }.firstOrNull() ?: run {
+            val userId = java.util.UUID.randomUUID().toString()
+            context.dataStore.edit { prefs ->
+                prefs[USER_ID] = userId
+            }
+            userId
+        }
+    }
+
     private suspend fun storeDateTime(key: Preferences.Key<String>, dateTime: OffsetDateTime) {
         context.dataStore.edit { prefs ->
             prefs[key] = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime)
@@ -54,5 +67,6 @@ class PassiveDataRepository(private val context: Context) {
         private val PASSIVE_DATA_ENABLED = booleanPreferencesKey("passive_data_enabled")
         private val LATEST_READING = stringPreferencesKey("latest_reading")
         private val LATEST_UPLOAD = stringPreferencesKey("latest_upload")
+        private val USER_ID = stringPreferencesKey("user_id")
     }
 }
