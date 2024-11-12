@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     alias(libs.plugins.roborazzi)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -103,6 +105,7 @@ dependencies {
 
     // Used for Datastore
     implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization)
 
     // Used for permissions
     implementation(libs.accompanist.permissions)

@@ -8,7 +8,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.onwd.arc.im.sidekick.data.HealthServicesRepository
+import com.onwd.arc.im.sidekick.MainApplication
 import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 import com.onwd.arc.im.sidekick.extensions.checkPermissions
 import com.onwd.arc.im.sidekick.work.PeriodicUploadScheduler
@@ -59,8 +59,9 @@ class RegisterForBackgroundDataWorker(
 
     override suspend fun doWork(): Result {
         Log.i(this::class.simpleName, "Worker running")
-        val healthServicesRepository = HealthServicesRepository(appContext)
-        healthServicesRepository.registerForPassiveData()
+        with(appContext as MainApplication) {
+            healthServicesRepository.registerForPassiveData()
+        }
         return Result.success()
     }
 }

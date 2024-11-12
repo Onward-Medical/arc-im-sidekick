@@ -2,6 +2,7 @@ package com.onwd.arc.im.sidekick
 
 import android.app.Application
 import com.onwd.arc.im.sidekick.data.HealthServicesRepository
+import com.onwd.arc.im.sidekick.data.JsonFileStore
 import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 import com.onwd.arc.im.sidekick.work.PeriodicUploadScheduler
 
@@ -13,6 +14,7 @@ val PERMISSIONS = listOf(
 
 class MainApplication : Application() {
     val healthServicesRepository by lazy { HealthServicesRepository(this) }
+    val jsonFileStore by lazy { JsonFileStore(this, "data") }
     val passiveDataRepository by lazy { PassiveDataRepository(this) }
 
     override fun onCreate() {

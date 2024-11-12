@@ -14,7 +14,8 @@ guava = "33.3.1-android"
 health-services = "1.0.0-rc02"
 horologist = "0.6.20"
 ktlint = "0.50.0"
-org-jetbrains-kotlin = "1.9.25"
+org-jetbrains-kotlin = "2.0.20"
+kotlin-serialization = "1.7.3"
 robolectric = "4.13"
 roborazzi = "1.29.0"
 ui-test-junit4 = "1.7.5"
@@ -28,7 +29,7 @@ androidx-health-services = { module = "androidx.health:health-services-client", 
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-ui-tooling = { module = "androidx.wear.compose:compose-ui-tooling", version.ref = "compose-ui-tooling" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
-androidx-splashscreen =  "androidx.core:core-splashscreen:1.0.1"
+androidx-splashscreen = "androidx.core:core-splashscreen:1.0.1"
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "ui-test-junit4" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui-test-manifest" }
 androidx-work = { module = "androidx.work:work-runtime", version.ref = "androidx-work" }
@@ -45,6 +46,7 @@ horologist-compose-material = { module = "com.google.android.horologist:horologi
 horologist-roboscreenshots = { module = "com.google.android.horologist:horologist-roboscreenshots", version.ref = "horologist" }
 junit = "junit:junit:4.13.2"
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
@@ -59,4 +61,5 @@ wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation",
 com-android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 com-diffplug-spotless = "com.diffplug.spotless:6.25.0"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "org-jetbrains-kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "org-jetbrains-kotlin" }

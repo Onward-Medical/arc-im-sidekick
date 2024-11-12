@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.concurrent.futures.await
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.HealthServicesClient
+import androidx.health.services.client.awaitWithException
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.HealthEvent
 import androidx.health.services.client.data.PassiveListenerConfig
@@ -46,11 +47,11 @@ class HealthServicesRepository(context: Context) {
         passiveMonitoringClient.setPassiveListenerServiceAsync(
             DataService::class.java,
             passiveListenerConfig
-        ).await()
+        ).awaitWithException()
     }
 
     suspend fun unregisterForPassiveData() {
         Log.i(this::class.simpleName, "Unregistering listeners")
-        passiveMonitoringClient.clearPassiveListenerServiceAsync().await()
+        passiveMonitoringClient.clearPassiveListenerServiceAsync().awaitWithException()
     }
 }
