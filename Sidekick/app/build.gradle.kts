@@ -113,6 +113,9 @@ dependencies {
     // Used for permissions
     implementation(libs.accompanist.permissions)
 
+    // Wear os sensors
+    implementation(libs.geotecinit.wearos.sensors)
+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // Testing

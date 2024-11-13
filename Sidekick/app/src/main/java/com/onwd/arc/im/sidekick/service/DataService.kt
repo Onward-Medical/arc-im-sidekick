@@ -21,7 +21,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
-private fun toPrimitive(value: Any?): JsonElement = when (value) {
+fun toPrimitive(value: Any?): JsonElement = when (value) {
     is Float -> JsonPrimitive(value)
     is Int -> JsonPrimitive(value)
     is Long -> JsonPrimitive(value)

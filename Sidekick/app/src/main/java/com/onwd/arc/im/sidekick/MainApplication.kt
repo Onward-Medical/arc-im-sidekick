@@ -8,7 +8,8 @@ import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 val PERMISSIONS = listOf(
     android.Manifest.permission.BODY_SENSORS,
     android.Manifest.permission.BODY_SENSORS_BACKGROUND,
-    android.Manifest.permission.ACTIVITY_RECOGNITION
+    android.Manifest.permission.ACTIVITY_RECOGNITION,
+    android.Manifest.permission.POST_NOTIFICATIONS
 )
 
 class MainApplication : Application() {
