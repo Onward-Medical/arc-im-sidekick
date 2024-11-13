@@ -36,6 +36,7 @@ fun SensorApp(
             val latestReading by viewModel.latestReading.collectAsState()
             val latestUpload by viewModel.latestUpload.collectAsState()
             val readingEnabled by viewModel.readingEnabled.collectAsState()
+            val userId by viewModel.userId
             val uiState by viewModel.uiState
 
             if (uiState == UiState.Supported) {
@@ -53,6 +54,7 @@ fun SensorApp(
                             readingEnabled,
                             latestReading,
                             latestUpload,
+                            userId,
                             onEnableClick = { viewModel.toggleEnabled() },
                             permissionState
                         )

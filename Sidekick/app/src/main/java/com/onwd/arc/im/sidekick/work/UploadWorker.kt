@@ -17,50 +17,50 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.internal.UTC
 
+private val client = OkHttpClient()
+
 internal class UploadWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
-    override suspend fun doWork(): Result {
-        return applicationContext.uploadData()
-    }
-}
+    override suspend fun doWork(): Result = try {
+        Log.i(UploadWorker::class.simpleName, "Uploading data")
 
-private val client = OkHttpClient()
-
-suspend fun Context.uploadData(): Result {
-    Log.i(UploadWorker::class.simpleName, "Uploading data")
-    val repository = (applicationContext as MainApplication).passiveDataRepository
-    val fileExport = with(applicationContext as MainApplication) {
-        jsonFileStore.export()
-    }
-
-    if (fileExport.length() == 0L) {
-        Log.i(UploadWorker::class.simpleName, "No data to upload")
-        return Result.success()
-    }
-
-    withContext(Dispatchers.IO) {
-        client.newCall(
-            okhttp3.Request.Builder()
-                .url(uploadUrl(repository.getUserId()))
-                .put(
-                    fileExport.asRequestBody("application/jsonl".toMediaType())
-                )
-                .header("x-ms-blob-type", "BlockBlob")
-                .build()
-        ).execute().use { response ->
-            if (!response.isSuccessful) {
-                Log.e(
-                    UploadWorker::class.simpleName,
-                    "Upload request failed: ${response.code}"
-                )
-            }
+        val repository = (applicationContext as MainApplication).passiveDataRepository
+        val fileExport = with(applicationContext as MainApplication) {
+            jsonFileStore.export()
         }
-    }
 
-    repository.storeLatestUpload(OffsetDateTime.now())
-    return Result.success()
+        if (fileExport.length() == 0L) {
+            Log.i(UploadWorker::class.simpleName, "No data to upload")
+            Result.success()
+        }
+
+        withContext(Dispatchers.IO) {
+            client.newCall(
+                okhttp3.Request.Builder()
+                    .url(uploadUrl(repository.getUserId()))
+                    .put(
+                        fileExport.asRequestBody("application/jsonl".toMediaType())
+                    )
+                    .header("x-ms-blob-type", "BlockBlob")
+                    .build()
+            ).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e(
+                        UploadWorker::class.simpleName,
+                        "Upload request failed: ${response.code}"
+                    )
+                    Result.failure()
+                }
+            }
+            repository.storeLatestUpload(OffsetDateTime.now())
+            Result.success()
+        }
+    } catch (e: Exception) {
+        Log.e(UploadWorker::class.simpleName, "Upload failed", e)
+        Result.failure()
+    }
 }
 
 private fun uploadUrl(userId: String) = URL(

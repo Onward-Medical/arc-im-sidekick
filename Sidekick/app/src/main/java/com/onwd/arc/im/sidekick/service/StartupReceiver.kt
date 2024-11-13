@@ -11,7 +11,6 @@ import androidx.work.WorkerParameters
 import com.onwd.arc.im.sidekick.MainApplication
 import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 import com.onwd.arc.im.sidekick.extensions.checkPermissions
-import com.onwd.arc.im.sidekick.work.PeriodicUploadScheduler
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -24,7 +23,6 @@ class StartupReceiver : BroadcastReceiver() {
         val repository = PassiveDataRepository(context)
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
-        PeriodicUploadScheduler.scheduleUploadWorker(context)
         runBlocking {
             if (repository.passiveDataEnabled.first()) {
                 // Make sure we have permission.

@@ -87,7 +87,7 @@ class DataService : PassiveListenerService() {
                                 )
                             ),
                             "endTime" to toPrimitive(
-                                it.getStartInstant(
+                                it.getEndInstant(
                                     Instant.ofEpochMilli(
                                         System.currentTimeMillis() - SystemClock.elapsedRealtime()
                                     )
@@ -150,7 +150,14 @@ class DataService : PassiveListenerService() {
                         "type" to JsonPrimitive("BatteryState"),
                         "datetime" to toPrimitive(OffsetDateTime.now()),
                         "value" to JsonPrimitive(batteryLevel),
-                        "status" to JsonPrimitive(batteryStatus)
+                        "status" to when (batteryStatus) {
+                            android.os.BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
+                            android.os.BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
+                            android.os.BatteryManager.BATTERY_STATUS_FULL -> "Full"
+                            android.os.BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not Charging"
+                            android.os.BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
+                            else -> "Invalid"
+                        }.let { JsonPrimitive(it) }
                     )
                 )
             )

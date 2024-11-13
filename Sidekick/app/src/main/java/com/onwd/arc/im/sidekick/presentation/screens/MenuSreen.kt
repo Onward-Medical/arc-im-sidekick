@@ -2,10 +2,13 @@ package com.onwd.arc.im.sidekick.presentation.screens
 
 import android.annotation.SuppressLint
 import android.text.format.DateUtils
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +27,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.onwd.arc.im.sidekick.R
 import com.onwd.arc.im.sidekick.presentation.SensorToggle
 import java.time.OffsetDateTime
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +48,7 @@ fun MenuScreen(
     enabled: Boolean,
     latestReading: OffsetDateTime?,
     latestUpload: OffsetDateTime?,
+    userId: String,
     onEnableClick: (Boolean) -> Unit,
     permissionState: MultiplePermissionsState
 ) {
@@ -78,13 +83,14 @@ fun MenuScreen(
             permissionState = permissionState
         )
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).width(120.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Text("Latest reading:")
             Text(relativeTimeSpanString(latestReading))
             Text("Latest upload:")
             Text(relativeTimeSpanString(latestUpload))
+            Text("User id: $userId", modifier = Modifier.horizontalScroll(rememberScrollState()))
         }
     }
 }
@@ -108,6 +114,7 @@ fun PreviewMenuScreen() {
         true,
         OffsetDateTime.now(),
         null,
+        UUID.randomUUID().toString(),
         {},
         permissionState = permissionState
     )

@@ -9,6 +9,7 @@ import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_FLEX_MILLIS
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.await
 import androidx.work.workDataOf
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.MainScope
@@ -26,13 +27,13 @@ internal class PeriodicUploadScheduler {
          * @param context the context to use.
          */
         fun scheduleUploadWorker(
-            context: Context,
-            runImmediately: Boolean = false
+            context: Context
         ) {
             val data = workDataOf()
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresCharging(false)
                 .build()
 
             val periodicWorkRequest = PeriodicWorkRequestBuilder<UploadWorker>(
@@ -45,20 +46,21 @@ internal class PeriodicUploadScheduler {
                 .setInputData(data)
                 .build()
 
-            WorkManager.getInstance(context)
-                .enqueueUniquePeriodicWork(
-                    WORKER_TAG,
-                    ExistingPeriodicWorkPolicy.UPDATE,
-                    periodicWorkRequest
-                )
-
-            if (runImmediately) {
-                MainScope().launch {
-                    try {
-                        context.uploadData()
-                    } catch (e: Exception) {
-                        Log.e(WORKER_TAG, "Failed to upload data", e)
-                    }
+            MainScope().launch {
+                try {
+                    WorkManager.getInstance(context)
+                        .enqueueUniquePeriodicWork(
+                            WORKER_TAG,
+                            ExistingPeriodicWorkPolicy.UPDATE,
+                            periodicWorkRequest
+                        ).await()
+                    Log.i(PeriodicUploadScheduler::class.simpleName, "Scheduled upload worker")
+                } catch (e: Exception) {
+                    Log.e(
+                        PeriodicUploadScheduler::class.simpleName,
+                        "Failed to schedule upload worker",
+                        e
+                    )
                 }
             }
         }

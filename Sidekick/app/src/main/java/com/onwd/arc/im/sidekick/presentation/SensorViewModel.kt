@@ -28,6 +28,8 @@ class SensorViewModel(
     val readingEnabled = passiveDataRepository.passiveDataEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
+    val userId = mutableStateOf("")
+
     val uiState: MutableState<UiState> = mutableStateOf(UiState.Startup)
 
     init {
@@ -38,6 +40,7 @@ class SensorViewModel(
             } else {
                 UiState.NotSupported
             }
+            userId.value = passiveDataRepository.getUserId()
         }
 
         viewModelScope.launch {
