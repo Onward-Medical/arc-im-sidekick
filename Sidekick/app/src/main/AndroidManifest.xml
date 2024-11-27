@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Required for HR sensor -->
     <uses-permission android:name="android.permission.BODY_SENSORS" />
@@ -52,7 +53,8 @@
         <service
             android:name=".service.ExtendedWearSensorRecordingService"
             android:exported="true"
-            android:foregroundServiceType="health" />
+            android:foregroundServiceType="health"
+            tools:ignore="ExportedService" />
 
         <service
             android:name=".service.DataService"

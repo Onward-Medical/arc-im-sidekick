@@ -5,6 +5,7 @@ import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintWriter
+import java.util.zip.GZIPOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,7 +15,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-private const val MAX_FILE_SIZE = 1024 * 1024 * 10 // 10MB
+private const val MAX_FILE_SIZE = 1024 * 1024 * 100 // 100MB
 
 class JsonFileStore(private val context: Context, private val prefix: String) {
     private val dataFlow: MutableSharedFlow<JsonElement> = MutableSharedFlow(0, 100)
@@ -41,6 +42,9 @@ class JsonFileStore(private val context: Context, private val prefix: String) {
         }
     }
 
+    /**
+     * Write data to the file.
+     */
     suspend fun write(data: JsonElement) {
         dataFlow.emit(data)
         if (Log.isLoggable(javaClass.simpleName, Log.DEBUG)) {
@@ -48,19 +52,24 @@ class JsonFileStore(private val context: Context, private val prefix: String) {
         }
     }
 
+    /**
+     * Compress and export the current data to a new file and clear the current file.
+     */
     suspend fun export() = withContext(Dispatchers.IO) {
         if (fileHandle.length() == 0L) {
             return@withContext
         }
         val tempFile = File.createTempFile(
             "$prefix-",
-            ".jsonl",
+            ".jsonl.gz",
             exportFolder
         )
         synchronized(fileHandle) {
-            fileHandle.copyTo(tempFile, overwrite = true)
+            outputWriter.flush()
+            GZIPOutputStream(tempFile.outputStream(), true).use { gzip ->
+                fileHandle.inputStream().copyTo(gzip)
+            }
             fileHandle.writeBytes(byteArrayOf())
         }
     }
 }
-
