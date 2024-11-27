@@ -5,4 +5,7 @@
     <string name="not_available">Not available on this device</string>
     <string name="warning">Warning</string>
     <string name="never">Never</string>
+
+    <string name="sensorization_notification_title">ARC-IM® Sidekick</string>
+    <string name="sensorization_notification_text">Recording sensor data</string>
 </resources>

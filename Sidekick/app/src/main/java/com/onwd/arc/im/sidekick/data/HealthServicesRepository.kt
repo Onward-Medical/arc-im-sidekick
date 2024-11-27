@@ -43,7 +43,7 @@ class HealthServicesRepository(context: Context) {
     }
 
     suspend fun registerForPassiveData() {
-        Log.i(this::class.simpleName, "Registering listener")
+        Log.i(HealthServicesRepository::class.simpleName, "Registering listener")
         passiveMonitoringClient.setPassiveListenerServiceAsync(
             DataService::class.java,
             passiveListenerConfig
@@ -51,7 +51,7 @@ class HealthServicesRepository(context: Context) {
     }
 
     suspend fun unregisterForPassiveData() {
-        Log.i(this::class.simpleName, "Unregistering listeners")
+        Log.i(HealthServicesRepository::class.simpleName, "Unregistering listeners")
         passiveMonitoringClient.clearPassiveListenerServiceAsync().awaitWithException()
     }
 }

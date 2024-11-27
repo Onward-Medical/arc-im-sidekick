@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.onwd.arc.im.sidekick.data.ActiveSensorRepository
 import com.onwd.arc.im.sidekick.data.HealthServicesRepository
 import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 
 class SensorViewModel(
     private val healthServicesRepository: HealthServicesRepository,
+    private val activeSensorRepository: ActiveSensorRepository,
     private val passiveDataRepository: PassiveDataRepository
 ) : ViewModel() {
     // Provides a hot flow of the latest HR value read from Data Store whilst there is an active
@@ -47,8 +49,10 @@ class SensorViewModel(
             passiveDataRepository.passiveDataEnabled.distinctUntilChanged().collect { enabled ->
                 if (enabled) {
                     healthServicesRepository.registerForPassiveData()
+                    activeSensorRepository.registerForActiveSensors()
                 } else {
                     healthServicesRepository.unregisterForPassiveData()
+                    activeSensorRepository.unregisterForActiveSensors()
                 }
             }
         }
@@ -64,6 +68,7 @@ class SensorViewModel(
 
 class SensorViewModelFactory(
     private val healthServicesRepository: HealthServicesRepository,
+    private val activeSensorRepository: ActiveSensorRepository,
     private val passiveDataRepository: PassiveDataRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -71,6 +76,7 @@ class SensorViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return SensorViewModel(
                 healthServicesRepository = healthServicesRepository,
+                activeSensorRepository = activeSensorRepository,
                 passiveDataRepository = passiveDataRepository
             ) as T
         }

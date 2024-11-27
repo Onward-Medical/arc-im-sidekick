@@ -1,5 +1,9 @@
 package com.onwd.arc.im.sidekick.data
 
+import com.onwd.arc.im.sidekick.sensors.LightSensor
+import com.onwd.arc.im.sidekick.sensors.PressureSensor
+import com.onwd.arc.im.sidekick.sensors.TemperatureSensor
+import com.onwd.arc.im.sidekick.sensors.record.ValueAndAccuracyRecord
 import com.onwd.arc.im.sidekick.service.toPrimitive
 import es.uji.geotec.backgroundsensors.record.Record
 import es.uji.geotec.backgroundsensors.record.TriAxialRecord
@@ -25,6 +29,9 @@ class MyRecordCallback(private val store: JsonFileStore) : RecordCallback<Record
                             WearSensor.MAGNETOMETER -> "Magnetometer"
                             WearSensor.HEART_RATE -> "HeartRate"
                             WearSensor.LOCATION -> "Location"
+                            TemperatureSensor -> "Temperature"
+                            PressureSensor -> "Pressure"
+                            LightSensor -> "Light"
                             else -> "Unknown"
                         }
                     ),
@@ -50,6 +57,11 @@ class MyRecordCallback(private val store: JsonFileStore) : RecordCallback<Record
                             "direction" to toPrimitive(record.direction),
                             "horizontalAccuracy" to toPrimitive(record.horizontalAccuracy),
                             "verticalAccuracy" to toPrimitive(record.verticalAccuracy)
+                        )
+
+                        is ValueAndAccuracyRecord -> mapOf(
+                            "value" to toPrimitive(record.value),
+                            "accuracy" to toPrimitive(record.accuracy)
                         )
 
                         else -> throw IllegalArgumentException("Unsupported record type: $record")

@@ -50,7 +50,7 @@
         </activity>
 
         <service
-            android:name="es.uji.geotec.wearossensors.services.WearSensorRecordingService"
+            android:name=".service.ExtendedWearSensorRecordingService"
             android:exported="true"
             android:foregroundServiceType="health" />
 

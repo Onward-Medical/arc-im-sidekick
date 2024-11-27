@@ -11,6 +11,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.horologist.compose.layout.AppScaffold
 import com.onwd.arc.im.sidekick.PERMISSIONS
+import com.onwd.arc.im.sidekick.data.ActiveSensorRepository
 import com.onwd.arc.im.sidekick.data.HealthServicesRepository
 import com.onwd.arc.im.sidekick.data.PassiveDataRepository
 import com.onwd.arc.im.sidekick.presentation.screens.MenuScreen
@@ -21,6 +22,7 @@ import com.onwd.arc.im.sidekick.presentation.theme.WearAppTheme
 @Composable
 fun SensorApp(
     healthServicesRepository: HealthServicesRepository,
+    activeSensorRepository: ActiveSensorRepository,
     passiveDataRepository: PassiveDataRepository
 ) {
     val navController = rememberSwipeDismissableNavController()
@@ -30,6 +32,7 @@ fun SensorApp(
             val viewModel: SensorViewModel = viewModel(
                 factory = SensorViewModelFactory(
                     healthServicesRepository = healthServicesRepository,
+                    activeSensorRepository = activeSensorRepository,
                     passiveDataRepository = passiveDataRepository
                 )
             )

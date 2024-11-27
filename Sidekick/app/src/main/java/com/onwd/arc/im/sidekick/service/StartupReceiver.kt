@@ -42,7 +42,7 @@ class StartupReceiver : BroadcastReceiver() {
         // sometimes the call to register for background data takes longer than that and our
         // BroadcastReceiver gets destroyed before it completes. Instead we schedule a WorkManager
         // job to perform the registration.
-        Log.i(this::class.simpleName, "Enqueuing worker")
+        Log.i(StartupReceiver::class.simpleName, "Enqueuing worker")
         WorkManager.getInstance(context).enqueue(
             OneTimeWorkRequestBuilder<RegisterForBackgroundDataWorker>().build()
         )
@@ -59,6 +59,7 @@ class RegisterForBackgroundDataWorker(
         Log.i(this::class.simpleName, "Worker running")
         with(appContext as MainApplication) {
             healthServicesRepository.registerForPassiveData()
+            activeSensorRepository.registerForActiveSensors()
         }
         return Result.success()
     }

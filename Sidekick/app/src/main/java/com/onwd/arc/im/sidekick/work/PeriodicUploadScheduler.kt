@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_FLEX_MILLIS
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -39,8 +38,8 @@ internal class PeriodicUploadScheduler {
             val periodicWorkRequest = PeriodicWorkRequestBuilder<UploadWorker>(
                 MIN_PERIODIC_INTERVAL_MILLIS,
                 TimeUnit.MILLISECONDS,
-                MIN_PERIODIC_FLEX_MILLIS,
-                TimeUnit.MILLISECONDS
+                15,
+                TimeUnit.MINUTES
             )
                 .setConstraints(constraints)
                 .setInputData(data)
@@ -51,7 +50,7 @@ internal class PeriodicUploadScheduler {
                     WorkManager.getInstance(context)
                         .enqueueUniquePeriodicWork(
                             WORKER_TAG,
-                            ExistingPeriodicWorkPolicy.UPDATE,
+                            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                             periodicWorkRequest
                         ).await()
                     Log.i(PeriodicUploadScheduler::class.simpleName, "Scheduled upload worker")

@@ -1,11 +1,12 @@
 package com.onwd.arc.im.sidekick.work
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import com.onwd.arc.im.sidekick.MainApplication
+import java.io.File
 import java.net.URL
 import java.net.URLEncoder
 import java.time.OffsetDateTime
@@ -23,15 +24,30 @@ internal class UploadWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
-    override suspend fun doWork(): Result = try {
+    @SuppressLint("RestrictedApi")
+    override suspend fun doWork(): Result {
         Log.i(UploadWorker::class.simpleName, "Uploading data")
 
-        val repository = (applicationContext as MainApplication).passiveDataRepository
-        val fileExport = with(applicationContext as MainApplication) {
-            jsonFileStore.export()
+        val app = applicationContext as MainApplication
+        val userId = app.passiveDataRepository.getUserId()
+
+        app.jsonFileStore.export()
+
+        for (fileExport in app.jsonFileStore.exportFolder.listFiles() ?: emptyArray()) {
+            if (uploadFile(fileExport, userId) is Result.Success) {
+                fileExport.delete()
+            } else {
+                // Fail fast if any upload fails
+                return Result.failure()
+            }
         }
 
-        if (fileExport.length() == 0L) {
+        app.passiveDataRepository.storeLatestUpload(OffsetDateTime.now())
+        return Result.success()
+    }
+
+    private suspend fun uploadFile(fileExport: File, userId: String) = try {
+        if (!fileExport.isFile() || fileExport.length() == 0L) {
             Log.i(UploadWorker::class.simpleName, "No data to upload")
             Result.success()
         }
@@ -39,7 +55,7 @@ internal class UploadWorker(
         withContext(Dispatchers.IO) {
             client.newCall(
                 okhttp3.Request.Builder()
-                    .url(uploadUrl(repository.getUserId()))
+                    .url(uploadUrl(userId))
                     .put(
                         fileExport.asRequestBody("application/jsonl".toMediaType())
                     )
@@ -54,7 +70,6 @@ internal class UploadWorker(
                     Result.failure()
                 }
             }
-            repository.storeLatestUpload(OffsetDateTime.now())
             Result.success()
         }
     } catch (e: Exception) {
